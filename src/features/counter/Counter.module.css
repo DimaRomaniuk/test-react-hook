@@ -9,6 +9,16 @@
   margin-right: 8px;
 }
 
+.tableWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.tableWrapperItem {
+  width: 800px;
+}
+
 .row:not(:last-child) {
   margin-bottom: 16px;
 }

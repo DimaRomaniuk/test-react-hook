@@ -1,68 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { Table, Loader } from 'semantic-ui-react'
 
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import {
-  decrement,
-  increment,
-  incrementByAmount,
-  incrementAsync,
-  incrementIfOdd,
-  selectCount,
-} from './counterSlice';
 import styles from './Counter.module.css';
+import {
+  clearData,
+  incrementAsync,
+  selectData,
+  selectStatus,
+} from './counterSlice';
 
 export function Counter() {
-  const count = useAppSelector(selectCount);
+  const data = useAppSelector(selectData);
+  const status = useAppSelector(selectStatus);
   const dispatch = useAppDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
 
-  const incrementValue = Number(incrementAmount) || 0;
+  useEffect(() => {
+    status === 'idle' && dispatch(incrementAsync());
+
+    return () => {dispatch(clearData())}
+  }, [])
+
 
   return (
-    <div>
-      <div className={styles.row}>
-        <button
-          className={styles.button}
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          -
-        </button>
-        <span className={styles.value}>{count}</span>
-        <button
-          className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          +
-        </button>
+    status !== 'success' ? (<Loader />) : (
+      <div className={styles.tableWrapper}>
+        <div className={styles.tableWrapperItem}>
+        <Table celled>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>$</Table.HeaderCell>
+            <Table.HeaderCell>€</Table.HeaderCell>
+            <Table.HeaderCell>£</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+    
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>{data?.bpi.USD.rate_float}</Table.Cell>
+            <Table.Cell>{data?.bpi.EUR.rate_float}</Table.Cell>
+            <Table.Cell>{data?.bpi.GBP.rate_float}</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+        </div>
       </div>
-      <div className={styles.row}>
-        <input
-          className={styles.textbox}
-          aria-label="Set increment amount"
-          value={incrementAmount}
-          onChange={(e) => setIncrementAmount(e.target.value)}
-        />
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementByAmount(incrementValue))}
-        >
-          Add Amount
-        </button>
-        <button
-          className={styles.asyncButton}
-          onClick={() => dispatch(incrementAsync(incrementValue))}
-        >
-          Add Async
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementIfOdd(incrementValue))}
-        >
-          Add If Odd
-        </button>
-      </div>
-    </div>
+    )
   );
 }
